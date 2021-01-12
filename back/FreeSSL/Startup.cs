@@ -23,7 +23,12 @@ namespace FreeSSL
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton<ISSLCtrlService, SSLCtrlService>();
-			services.AddControllers();
+			
+			services.AddControllers()
+				.AddNewtonsoftJson();
+
+			services.AddMemoryCache();
+
 			services.AddCors(opts =>
 			{
 				opts.AddPolicy(name: MyAllowSpecificOrigins, build =>

@@ -1,5 +1,6 @@
 ﻿using Certes;
 using Certes.Acme;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,39 +13,65 @@ namespace FreeSSL.Domain
 	{
 		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains);
 
-		Task<bool> CheckHttpResultAsync(HttpChallengeResult challenge);
+		Task<string> TryDownloadCert(Guid id);
 
 		public class StartGetSSLResult
 		{
-			public List<HttpChallengeResult> ChalengeResults = new List<HttpChallengeResult>();
+			public StartGetSSLResult()
+			{
+				Id = Guid.NewGuid();
+			}
+
+			public Guid Id { get; set; }
+			public List<HttpChallengeResult> ChalengeResults { get; set; } = new List<HttpChallengeResult>();
 		}
 
 		public class HttpChallengeResult
 		{
 			public string Key { get; set; }
 			public string Token { get; set; }
-			public Uri Location { get; set; }
+			public string Location { get; set; }
 		}
-
 
 	}
 
 	public class SSLCtrlService : ISSLCtrlService
 	{
-		public Task<bool> CheckHttpResultAsync(HttpChallengeResult challenge)
+
+		private readonly IMemoryCache _memCache;
+
+		public SSLCtrlService(IMemoryCache memoryCache)
 		{
-			throw new NotImplementedException();
+			_memCache = memoryCache;
 		}
 
-		//public SSLCtrlService() { }
+		public async Task<string> TryDownloadCert(Guid id)
+		{
+			if (_memCache.TryGetValue<(IOrderContext, IChallengeContext[])>(id, out var result))
+			{
+				var (order, challenges) = result;
 
-		//public Task<bool> CheckHttpResultAsync(HttpChallengeResult challenge)
-		//{
-		//	var using req = 
-		//}
+				foreach (var challenge in challenges)
+				{
+					var validateResult = await challenge.Validate();
+					if (validateResult.Status == Certes.Acme.Resource.ChallengeStatus.Invalid)
+					{
+						throw new Exception("Invalid validate error");
+					}
+				}
+
+				var cert = await order.Download();
+				return cert.ToPem();
+
+			}
+
+			throw new Exception("Wait for too long, you session expired");
+		}
 
 		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains)
 		{
+			domains = domains.Select(d => d.TrimEnd('/')).ToArray();
+
 			var acme = new AcmeContext(WellKnownServers.LetsEncryptStagingV2);
 			var acc = acme.NewAccount("ulweader@gmail.com", true);
 
@@ -53,16 +80,32 @@ namespace FreeSSL.Domain
 			var order = await acme.NewOrder(domains);
 			var challenges = await Task.WhenAll((await order.Authorizations()).Select(a => a.Http()));
 
-			var getSSLResults = new StartGetSSLResult();
+			var enumDomain = domains.GetEnumerator();
 
-			getSSLResults.ChalengeResults = challenges.Select(c => new HttpChallengeResult
+			var getSSLResults = new StartGetSSLResult
 			{
-				Key = c.KeyAuthz,
-				Location = c.Location,
-				Token = c.Token
-			}).ToList();
+				ChalengeResults = challenges.Select(c =>
+				{
+					enumDomain.MoveNext();
+
+					return new HttpChallengeResult
+					{
+						Key = c.KeyAuthz,
+						Location = $"http://{enumDomain.Current}/.well-known/acme-challenge/{c.Token}",
+						Token = c.Token
+					};
+
+				}).ToList()
+			};
+
+			_memCache.Set(getSSLResults.Id, (order, challenges), new MemoryCacheEntryOptions
+			{ 
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+			});
 
 			return getSSLResults;
+
 		}
+
 	}
 }

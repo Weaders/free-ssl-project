@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
-import sslForm from '../features/ssl-form/sslFormSlice';
+import mainDataReducer from './store-data/main'
+import sslFormReducer  from './store-data/ssl-form'
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
-    sslForm
-  },
+    sslForm: sslFormReducer,
+    main: mainDataReducer
+  }
 });
