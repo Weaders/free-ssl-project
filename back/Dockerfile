@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-expose 5000
 WORKDIR /app
 
 COPY *.sln .
@@ -15,7 +14,6 @@ COPY FreeSSL/. ./FreeSSL/
 COPY FreeSSL.Domain/. ./FreeSSL.Domain/
 WORKDIR /app/FreeSSL
 RUN dotnet publish -c Release -o /out --no-restore
-
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
 WORKDIR /app

@@ -4,8 +4,8 @@ services:
     image: nginx:alpine
     hostname: 'nginx'
     volumes:
-      - ./Config/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./Config/proxy.conf:/etc/nginx/proxy.conf:ro
+      - ./NgnixConfig/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./NgnixConfig/proxy.conf:/etc/nginx/proxy.conf:ro
     ports:
       - '80:80'
     depends_on:
