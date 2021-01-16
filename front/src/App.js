@@ -3,6 +3,7 @@ import './App.css';
 import { AppBar, Toolbar, Typography, makeStyles } from '@material-ui/core'
 import Container from '@material-ui/core/Container'
 import { SSLForm } from './features/ssl-form/SSLForm'
+import c from './app/config'
 
 const useStyles = makeStyles({
   headaerText: {
@@ -19,6 +20,8 @@ const useStyles = makeStyles({
 });
 
 function App() {
+
+  console.log(c, process.env);
 
   const styles = useStyles();
 

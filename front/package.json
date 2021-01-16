@@ -17,6 +17,7 @@
     "react-scripts": "4.0.1"
   },
   "scripts": {
+    "start-prod": "NODE_ENV=produciton react-scripts start ",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

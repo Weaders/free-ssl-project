@@ -1,0 +1,35 @@
+version: '3'
+volumes:
+  front_html:
+
+services:
+  nginx:
+    image: nginx:alpine
+    hostname: 'ssl-get.site'
+    environment:
+      - "NODE_ENV=production"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/proxy.conf:/etc/nginx/proxy.conf:ro
+      - 'front_html:/usr/share/nginx/html'
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+      - front
+    restart: always
+
+  api:
+    build: ./back
+    ports:
+      - '5000'
+    restart: always 
+
+  front:
+    build: ./front
+    volumes:
+      - 'front_html:/var/www'
+    environment:
+      - "NODE_ENV=production"
+    ports:
+      - '3000'
