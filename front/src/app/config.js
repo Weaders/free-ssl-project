@@ -3,7 +3,7 @@ const config = {
 };
 
 if (process.env.NODE_ENV === 'production'){
-    config.site = 'http://api.ssl-get.site'
+    config.site = 'http://api.ssl-get.site.'
 }
 
 export default config;

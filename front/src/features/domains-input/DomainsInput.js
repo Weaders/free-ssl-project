@@ -40,7 +40,7 @@ export default function DomainsInput() {
     const [useWWW, setUseWWW] = useState(true);
     let dispatch = useDispatch();
     let styles = useStyles();
-    let domains = useSelector(getDomains).map(d => <Chip className={styles.chipStyle}  label={d} onDelete={() => dispatch(removeDomain(d))} />);
+    let domains = useSelector(getDomains).map(d => <Chip key={d} className={styles.chipStyle}  label={d} onDelete={() => dispatch(removeDomain(d))} />);
     let translate = useSelector(getTranslate);
 
     const addDomainFromTextBox = () => {

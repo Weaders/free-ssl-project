@@ -13,7 +13,7 @@ namespace FreeSSL.Domain
 	{
 		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains);
 
-		Task<string> TryDownloadCert(Guid id);
+		Task<DownloadCersResult> TryDownloadCert(Guid id);
 
 		public class StartGetSSLResult
 		{
@@ -33,6 +33,12 @@ namespace FreeSSL.Domain
 			public string Location { get; set; }
 		}
 
+		public class DownloadCersResult 
+		{ 
+			public string PrivateKey { get; set; }
+			public string PemKey { get; set; }
+		}
+
 	}
 
 	public class SSLCtrlService : ISSLCtrlService
@@ -45,7 +51,7 @@ namespace FreeSSL.Domain
 			_memCache = memoryCache;
 		}
 
-		public async Task<string> TryDownloadCert(Guid id)
+		public async Task<DownloadCersResult> TryDownloadCert(Guid id)
 		{
 			if (_memCache.TryGetValue<(IOrderContext, IChallengeContext[])>(id, out var result))
 			{
@@ -60,9 +66,14 @@ namespace FreeSSL.Domain
 					}
 				}
 
-				var cert = await order.Download();
-				return cert.ToPem();
+				var privateKey = KeyFactory.NewKey(KeyAlgorithm.ES256);
+				await order.Finalize(new CsrInfo { }, privateKey);
+				var certChain = await order.Download();
 
+				return new DownloadCersResult {
+					PemKey = certChain.Certificate.ToPem(),
+					PrivateKey = privateKey.ToPem()
+				};
 			}
 
 			throw new Exception("Wait for too long, you session expired");

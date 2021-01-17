@@ -22,9 +22,9 @@ namespace FreeSSL.Controllers
 			=> Json(await _sslCtrl.StartGetSSLAsync(msg.Domains));
 
 		[HttpPost("download")]
-		public async Task<IActionResult> DownloadCertificate([FromBody]string id)
+		public async Task<IActionResult> DownloadCertificate([FromBody] DownloadMsg msg)
 		{
-			if (Guid.TryParse(id, out var sessionId))
+			if (Guid.TryParse(msg.Id, out var sessionId))
 			{
 				return Ok(await _sslCtrl.TryDownloadCert(sessionId));
 			}
@@ -37,6 +37,11 @@ namespace FreeSSL.Controllers
 		{
 			public string[] Domains { get; set; }
 
+		}
+
+		public class DownloadMsg
+		{ 
+			public string Id { get; set; }
 		}
 	}
 }
