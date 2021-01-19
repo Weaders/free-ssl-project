@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
     },
     typographyKey: {
         whiteSpace: 'break-spaces'
+    },
+    thisIsYourCert: {
+        fontSize: '19px'
     }
 }));
 
@@ -50,15 +53,20 @@ export function SSLForm(){
     const classes = useStyles();    
     const dispatch = useDispatch();
     let challenges = useSelector(getChallenges);
-    let cerData = useSelector(getCertData);
+    let certData = useSelector(getCertData);
     let translate = useSelector(getTranslate)
 
     let content = null;
     
-    if (cerData != null){
+    if (certData != null){
 
         content = (
             <React.Fragment>
+                <Card className={classes.createFileInfo}>
+                    <CardContent className={classes.thisIsYourCert}>
+                        {translate("there_you_certificate")}: <b>Date: {certData.expiredDate.toLocaleString()}</b>
+                    </CardContent>
+                </Card>
                 <Card className={classes.createFileInfo}>
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="h2">
@@ -66,7 +74,7 @@ export function SSLForm(){
                         </Typography>
                         <Divider className={classes.dividerStyle} />
                         <Typography className={classes.typographyKey}>
-                            {cerData.pemKey}
+                            {certData.pemKey}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -77,7 +85,7 @@ export function SSLForm(){
                         </Typography>
                         <Divider className={classes.dividerStyle} />
                         <Typography className={classes.typographyKey}>
-                            {cerData.privateKey}
+                            {certData.privateKey}
                         </Typography>
                     </CardContent>
                 </Card>

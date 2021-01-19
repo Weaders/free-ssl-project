@@ -4,6 +4,10 @@ import { getIsLoading } from './app/store-data/main'
 import { AppBar, Toolbar, Typography, makeStyles, Backdrop, CircularProgress } from '@material-ui/core'
 import Container from '@material-ui/core/Container'
 import { SSLForm } from './features/ssl-form/SSLForm'
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const useStyles = makeStyles({
   header: {
@@ -48,6 +52,7 @@ function App() {
       <Backdrop open={isLoad} className={styles.backdrop}>
         <CircularProgress color="primary"/>
       </Backdrop>
+      <ToastContainer />
     </React.Fragment>
   );
 }

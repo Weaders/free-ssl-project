@@ -11,7 +11,7 @@ namespace FreeSSL.Domain
 {
 	public interface ISSLCtrlService
 	{
-		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains);
+		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains, AccountData accountData);
 
 		Task<DownloadCersResult> TryDownloadCert(Guid id);
 
@@ -33,10 +33,21 @@ namespace FreeSSL.Domain
 			public string Location { get; set; }
 		}
 
-		public class DownloadCersResult 
-		{ 
+		public class DownloadCersResult
+		{
 			public string PrivateKey { get; set; }
 			public string PemKey { get; set; }
+			public DateTime ExpiredDate { get; set; }
+
+			public DownloadCersResult() 
+			{
+				ExpiredDate = DateTime.UtcNow.AddDays(90);
+			}
+		}
+
+		public class AccountData 
+		{
+			public string AccountPemKey { get; set; }
 		}
 
 	}
@@ -45,6 +56,8 @@ namespace FreeSSL.Domain
 	{
 
 		private readonly IMemoryCache _memCache;
+
+		private string accountPemKey = null;
 
 		public SSLCtrlService(IMemoryCache memoryCache)
 		{
@@ -66,11 +79,14 @@ namespace FreeSSL.Domain
 					}
 				}
 
-				var privateKey = KeyFactory.NewKey(KeyAlgorithm.ES256);
+				var privateKey = KeyFactory.NewKey(KeyAlgorithm.RS256);
+
+
 				await order.Finalize(new CsrInfo { }, privateKey);
 				var certChain = await order.Download();
 
-				return new DownloadCersResult {
+				return new DownloadCersResult
+				{
 					PemKey = certChain.Certificate.ToPem(),
 					PrivateKey = privateKey.ToPem()
 				};
@@ -79,14 +95,28 @@ namespace FreeSSL.Domain
 			throw new Exception("Wait for too long, you session expired");
 		}
 
-		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains)
+		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains, AccountData accountData)
 		{
 			domains = domains.Select(d => d.TrimEnd('/')).ToArray();
+			
+			AcmeContext acme;
 
-			var acme = new AcmeContext(WellKnownServers.LetsEncryptStagingV2);
-			var acc = acme.NewAccount("ulweader@gmail.com", true);
-
-			//var accKey = acme.AccountKey.ToPem();
+			if (!string.IsNullOrEmpty(accountData?.AccountPemKey))
+			{
+				var accountKey = KeyFactory.FromPem(accountData?.AccountPemKey);
+				acme = new AcmeContext(WellKnownServers.LetsEncryptStagingV2, accountKey);
+			}
+			else if (!string.IsNullOrEmpty(accountPemKey))
+			{
+				var accountKey = KeyFactory.FromPem(accountPemKey);
+				acme = new AcmeContext(WellKnownServers.LetsEncryptStagingV2, accountKey);
+			}
+			else
+			{
+				acme = new AcmeContext(WellKnownServers.LetsEncryptStagingV2);
+				var account = await acme.NewAccount("ulweader@gmail.com", true);
+				accountPemKey = acme.AccountKey.ToPem();
+			}
 
 			var order = await acme.NewOrder(domains);
 			var challenges = await Task.WhenAll((await order.Authorizations()).Select(a => a.Http()));
@@ -110,7 +140,7 @@ namespace FreeSSL.Domain
 			};
 
 			_memCache.Set(getSSLResults.Id, (order, challenges), new MemoryCacheEntryOptions
-			{ 
+			{
 				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
 			});
 

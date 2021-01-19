@@ -1,4 +1,5 @@
 using FreeSSL.Domain;
+using FreeSSL.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +35,8 @@ namespace FreeSSL
 				.AddNewtonsoftJson();
 
 			services.AddMemoryCache();
+
+			services.Configure<AccountDataOptions>(Configuration.GetSection(AccountDataOptions.KEY_SETTING));
 
 			services.AddCors(opts =>
 			{

@@ -3,8 +3,7 @@ import { Card, CardContent, Divider } from '@material-ui/core'
 import { useSelector } from 'react-redux';
 import { getTranslate } from './../../app/store-data/main'
 import { makeStyles } from '@material-ui/core/styles';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import CopyIcon from './../copy-icon/CopyIcon'
 
 const useStyles = makeStyles((theme) => ({
     hrefTitle: {
@@ -37,18 +36,14 @@ export default function ChallengeCheckerCard(props) {
                 <p className={styles.hrefTitle}>
                     {translate('filename')}:  
                      <b>{props.fileName}</b>
-                    <CopyToClipboard text={props.fileName}>
-                        <a title={translate("copy")} className={styles.copyContent} onClick={() => false}><FileCopyIcon></FileCopyIcon></a>
-                    </CopyToClipboard>
+                     <CopyIcon text={props.fileName} />
                 </p>
                 <p>{translate("file_link")}: <a href={props.location}>{props.location}</a></p>
                 <Divider className={styles.divider} />
                 <p className={styles.keyTitle}>{translate('file_must_contain')}:</p>
                 <p className={styles.keyText}>
                     {props.fileKey}
-                    <CopyToClipboard text={props.fileKey}>
-                        <a href="#" title={translate("copy")} className={styles.copyContent} onClick={() => false}><FileCopyIcon></FileCopyIcon></a>
-                    </CopyToClipboard>
+                    <CopyIcon text={props.fileKey} />
                 </p>
             </div>
         </CardContent>
