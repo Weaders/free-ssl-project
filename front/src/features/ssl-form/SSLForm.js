@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import { getCertAsync, startAsync, getChallenges, clearChallenges, getCertData } from '../../app/store-data/ssl-form'
+import { getCertAsync, startAsync, getChallenges, clearChallenges, getCertData, getDomains } from '../../app/store-data/ssl-form'
 import Button from '@material-ui/core/Button';
 import ChallengerCheckerCard from './../challenge-checker/ChallengeCheckerCard'
 import DomainsInput from './../domains-input/DomainsInput'
@@ -53,6 +53,7 @@ export function SSLForm(){
     const classes = useStyles();    
     const dispatch = useDispatch();
     let challenges = useSelector(getChallenges);
+    let domains = useSelector(getDomains);
     let certData = useSelector(getCertData);
     let translate = useSelector(getTranslate)
 
@@ -96,7 +97,7 @@ export function SSLForm(){
 
         content = (<React.Fragment>
             <DomainsInput />
-            <Button onClick={e => dispatch(startAsync())} className={classes.btnSubmit} fullWidth variant="contained" color="primary" disableElevation>
+            <Button disabled={domains.length <= 0} onClick={e => dispatch(startAsync())} className={classes.btnSubmit} fullWidth variant="contained" color="primary" disableElevation>
                 {translate("start_generate_ssl")}
             </Button>
         </React.Fragment>);

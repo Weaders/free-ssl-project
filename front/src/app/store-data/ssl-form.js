@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios'
 import config from './../../app/config'
 import _ from 'lodash'
+import Request from './../request'
 import { setIsLoading } from './main'
 
 export const sslFormSlice = createSlice({
@@ -34,7 +35,6 @@ export const sslFormSlice = createSlice({
                 privateKey: action.payload.privateKey,
                 pemKey: action.payload.pemKey
             };
-            console.log(state.certData);
         }
     }
 });

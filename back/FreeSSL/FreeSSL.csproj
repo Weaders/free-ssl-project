@@ -17,9 +17,5 @@
     <ProjectReference Include="..\FreeSSL.Domain\FreeSSL.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
-
 
 </Project>

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL", "FreeSSL\FreeSSL.csproj", "{E00D360B-33AE-4252-A9E8-4CC4E38424C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSSL.Domain", "FreeSSL.Domain\FreeSSL.Domain.csproj", "{D1AB2C99-8804-42BD-86FD-09419471A52F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL.Domain", "FreeSSL.Domain\FreeSSL.Domain.csproj", "{D1AB2C99-8804-42BD-86FD-09419471A52F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

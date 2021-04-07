@@ -1,5 +1,6 @@
 ﻿using FreeSSL.Domain;
 using FreeSSL.Models;
+using FreeSSL.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;

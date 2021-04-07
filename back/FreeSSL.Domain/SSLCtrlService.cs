@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using static FreeSSL.Domain.ISSLCtrlService;
 
@@ -54,14 +55,15 @@ namespace FreeSSL.Domain
 
 	public class SSLCtrlService : ISSLCtrlService
 	{
-
+		private readonly IHttpClientFactory _clientFactory;
 		private readonly IMemoryCache _memCache;
 
 		private string accountPemKey = null;
 
-		public SSLCtrlService(IMemoryCache memoryCache)
+		public SSLCtrlService(IMemoryCache memoryCache, IHttpClientFactory factory)
 		{
 			_memCache = memoryCache;
+			_clientFactory = factory;
 		}
 
 		public async Task<DownloadCersResult> TryDownloadCert(Guid id)
@@ -70,9 +72,24 @@ namespace FreeSSL.Domain
 			{
 				var (order, challenges) = result;
 
+				await challenges.First().Validate();
+
+				using var client = _clientFactory.CreateClient();
+
+				var failedChecks = (await Task.WhenAll(challenges.Select(async (challenge) => {
+					var result = await client.GetAsync(challenge.Location);
+					return (challenge, challenge.KeyAuthz == await result.Content.ReadAsStringAsync());
+				}))).Where(c => !c.Item2).Select(c => new FailedDomainValidation(c.challenge));
+
+				if (failedChecks.Any())
+					throw new HttpValidationException(failedChecks);
+
 				foreach (var challenge in challenges)
 				{
-					var validateResult = await challenge.Validate();
+					await challenge.Validate();
+
+					var validateResult = await challenge.Resource();
+
 					if (validateResult.Status == Certes.Acme.Resource.ChallengeStatus.Invalid)
 					{
 						throw new Exception("Invalid validate error");
@@ -80,7 +97,6 @@ namespace FreeSSL.Domain
 				}
 
 				var privateKey = KeyFactory.NewKey(KeyAlgorithm.RS256);
-
 
 				await order.Finalize(new CsrInfo { }, privateKey);
 				var certChain = await order.Download();
@@ -92,7 +108,7 @@ namespace FreeSSL.Domain
 				};
 			}
 
-			throw new Exception("Wait for too long, you session expired");
+			throw new SessionExpirationException();
 		}
 
 		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains, AccountData accountData)

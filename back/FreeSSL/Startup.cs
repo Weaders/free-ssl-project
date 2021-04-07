@@ -1,12 +1,15 @@
 using FreeSSL.Domain;
 using FreeSSL.Models;
+using FreeSSL.ViewModels;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
@@ -30,11 +33,12 @@ namespace FreeSSL
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton<ISSLCtrlService, SSLCtrlService>();
-			
+
 			services.AddControllers()
 				.AddNewtonsoftJson();
 
 			services.AddMemoryCache();
+			services.AddHttpClient();
 
 			services.Configure<AccountDataOptions>(Configuration.GetSection(AccountDataOptions.KEY_SETTING));
 
@@ -50,10 +54,22 @@ namespace FreeSSL
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
+
+			app.UseExceptionHandler(err =>
+				err.Run(async ctx =>
+				{
+					var feature = ctx.Features.Get<IExceptionHandlerPathFeature>();
+
+					if (feature.Error is IWithHumanOutput humanOutput)
+					{
+						await ctx.Response.WriteAsJsonAsync(new ObjectError(humanOutput));
+					}
+					else
+					{
+						await ctx.Response.WriteAsJsonAsync(new ObjectError(feature.Error));
+					}
+				})
+			);
 
 			app.UseHttpsRedirection();
 

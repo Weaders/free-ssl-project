@@ -4,19 +4,29 @@ import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
 import { getDomains, removeDomain, addDomain } from './../../app/store-data/ssl-form'
 import { getTranslate } from './../../app/store-data/main'
+import { Card, CardContent, Divider } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     rootTags: {
-      border: '1px solid rgba(196, 196, 196, 1)',
-      padding: '15px',
-      'margin-bottom': '10px',
-      'border-radius': '16px',
+      // border: '1px solid rgba(196, 196, 196, 1)',
+      // padding: '15px',
+      // 'margin-bottom': '10px',
+      // 'border-radius': '16px',
       display: 'flex',
       justifyContent: 'center',
-      flexWrap: 'wrap',
+      // flexWrap: 'wrap',
+      // marginTop: '10px',
       '& > *': {
         margin: theme.spacing(0.5),
       },
+    },
+    textStyle: {
+      borderTop: '1px solid',
+      borderColor: '#d1d1d1',
+      paddingTop: '10px',
+      fontSize: '20px',
+      textAlign: 'center',
+      fontStyle: 'italic'
     },
     chipStyle: {
       'font-size': '18px',
@@ -59,14 +69,19 @@ export default function DomainsInput() {
 
     if (domains.length){
       domainsContianer = (
-        <div className={styles.rootTags}>
-          {domains}
+        <div>
+          <p className={styles.textStyle}>{translate('domains_generated_will')}</p>
+          <Card>
+            <CardContent className={styles.rootTags}>
+              {domains}
+            </CardContent>
+          </Card>
         </div>
       );
     }
 
     return(<div>
-      {domainsContianer}
+      
       <div className={styles.rootInput}>
         <Grid container spacing={3}>
           <Grid item xs={9}>
@@ -83,6 +98,7 @@ export default function DomainsInput() {
           label={translate("authomatic_add_with_www")}
         />
       </FormGroup>
+      {domainsContianer}
     </div>
     );
 
