@@ -47,7 +47,7 @@ export const startAsync = state => async (dispatch, getState) => {
 
         dispatch(setIsLoading(true));
 
-        let result = await axios.post(`${config.site}api/ssl/start`, {
+        let result = await axios.post(`${config.site}ssl/start`, {
             domains: getState().sslForm.domains
         });
 
@@ -68,7 +68,7 @@ export const getCertAsync = state => async (dispatch, getState) => {
 
         dispatch(setIsLoading(true));
 
-        let result = await axios.post(`${config.site}api/ssl/download`, {
+        let result = await axios.post(`${config.site}ssl/download`, {
             id: state.sslForm.sessionId
         });
 

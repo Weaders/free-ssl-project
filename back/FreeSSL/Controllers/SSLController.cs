@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FreeSSL.Controllers
 {
-	[Route("api/ssl")]
+	[Route("v1/ssl")]
 	[ApiController]
 	public class SSLController : Controller
 	{
