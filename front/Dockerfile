@@ -8,6 +8,7 @@ RUN npm install && npm run build
 
 WORKDIR /var
 
+RUN rm -rf /var/www
 RUN cp -r /app/build/ /var/www/
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
