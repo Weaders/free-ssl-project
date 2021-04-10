@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  teamcity:
+    image: jetbrains/teamcity-server
+    ports:
+      - "8112:8111"
+    volumes:
+      - ./data:/data/teamcity_server/datadir
+      - ./logs:/opt/teamcity/logs
+  teamcity-agent-1:
+    build: teamcity/agent
+    user: root
+    volumes:
+      - ./agent/conf:/data/teamcity_agent/conf
+      - docker_volumes:/var/lib/docker
+    environment:
+      - AGENT_NAME="Agent 1"
+      - SERVER_URL=http://teamcity:8111
+      - DOCKER_IN_DOCKER=start
+    privileged: true
+volumes:
+  docker_volumes:

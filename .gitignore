@@ -1,0 +1,9 @@
+#TeamCity
+teamcity/data/*
+!teamcity/data/.gitkeep
+
+teamcity/logs/*
+!teamcity/logs/.gitkeep
+
+teamcity/agent/conf/*
+!teamcity/agent/conf/.gitkeep
