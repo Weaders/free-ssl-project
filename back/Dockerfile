@@ -13,11 +13,9 @@ COPY FreeSSL/. ./FreeSSL/
 COPY FreeSSL.Domain/. ./FreeSSL.Domain/
 COPY FreeSSL.Tests/. ./FreeSSL.Tests/
 
-WORKDIR /app/FreeSSL
+WORKDIR /app
 RUN dotnet publish -c Release -o /out --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
-WORKDIR /app
-COPY --from=build /out ./
+RUN cp -r /out /publish
 ENV ASPNETCORE_URLS http://*:5000
-ENTRYPOINT ["dotnet", "FreeSSL.dll"]
+ENTRYPOINT ["dotnet", "/publish/FreeSSL.dll"]
