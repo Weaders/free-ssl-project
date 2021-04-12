@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL", "FreeSSL\FreeSSL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL.Domain", "FreeSSL.Domain\FreeSSL.Domain.csproj", "{D1AB2C99-8804-42BD-86FD-09419471A52F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSSL.Tests", "FreeSSL.Tests\FreeSSL.Tests.csproj", "{A05B49AC-7503-4702-8879-2B9F885AD1B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D1AB2C99-8804-42BD-86FD-09419471A52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1AB2C99-8804-42BD-86FD-09419471A52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1AB2C99-8804-42BD-86FD-09419471A52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A05B49AC-7503-4702-8879-2B9F885AD1B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A05B49AC-7503-4702-8879-2B9F885AD1B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A05B49AC-7503-4702-8879-2B9F885AD1B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A05B49AC-7503-4702-8879-2B9F885AD1B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

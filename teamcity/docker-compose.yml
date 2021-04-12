@@ -9,7 +9,7 @@ services:
       - ./data:/data/teamcity_server/datadir
       - ./logs:/opt/teamcity/logs
   teamcity-agent-1:
-    build: teamcity/agent
+    build: agent
     user: root
     volumes:
       - ./agent/conf:/data/teamcity_agent/conf
