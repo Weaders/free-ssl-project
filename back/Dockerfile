@@ -5,13 +5,14 @@ COPY *.sln .
 
 COPY FreeSSL/*.csproj ./FreeSSL/
 COPY FreeSSL.Domain/*.csproj ./FreeSSL.Domain/
-RUN ls
-RUN ls
+COPY FreeSSL.Tests/*.csproj ./FreeSSL.Tests/
 
 RUN dotnet restore
 
 COPY FreeSSL/. ./FreeSSL/
 COPY FreeSSL.Domain/. ./FreeSSL.Domain/
+COPY FreeSSL.Tests/. ./FreeSSL.Tests/
+
 WORKDIR /app/FreeSSL
 RUN dotnet publish -c Release -o /out --no-restore
 
