@@ -1,5 +1,5 @@
 const config = {
-    site: 'https://localhost:44377/'
+    site: 'https://localhost:44377/v1/'
 };
 
 if (process.env.NODE_ENV === 'production') {

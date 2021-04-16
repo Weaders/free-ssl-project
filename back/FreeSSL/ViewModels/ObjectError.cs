@@ -1,4 +1,5 @@
 ﻿using FreeSSL.Domain;
+using FreeSSL.Domain.Exceptions;
 using System;
 
 namespace FreeSSL.ViewModels

@@ -1,4 +1,4 @@
-﻿namespace FreeSSL.Domain
+﻿namespace FreeSSL.Domain.Exceptions
 {
 	public interface IWithHumanOutput
 	{

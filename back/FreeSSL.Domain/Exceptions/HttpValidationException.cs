@@ -1,10 +1,10 @@
 ﻿using Certes.Acme;
-using Certes.Acme.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static FreeSSL.Domain.SSLService.ISSLCtrlService;
 
-namespace FreeSSL.Domain
+namespace FreeSSL.Domain.Exceptions
 {
 	public class HttpValidationException : Exception, IWithHumanOutput
 	{
@@ -19,9 +19,9 @@ namespace FreeSSL.Domain
 
 	}
 
-	public record FailedDomainValidation(string Location, string ExceptionValue) 
+	public record FailedDomainValidation(string Location, string ExceptionValue)
 	{
-		public FailedDomainValidation(IChallengeContext challenge) : this(challenge.Location.ToString(), challenge.KeyAuthz) { }
+		public FailedDomainValidation(HttpChallengeResult challenge) : this(challenge.Location.ToString(), challenge.Token) { }
 	}
 
 }

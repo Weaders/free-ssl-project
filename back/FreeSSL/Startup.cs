@@ -1,4 +1,6 @@
 using FreeSSL.Domain;
+using FreeSSL.Domain.Exceptions;
+using FreeSSL.Domain.SSLService;
 using FreeSSL.Models;
 using FreeSSL.ViewModels;
 using Microsoft.AspNetCore.Builder;

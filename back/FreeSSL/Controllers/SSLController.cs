@@ -1,4 +1,5 @@
 ﻿using FreeSSL.Domain;
+using FreeSSL.Domain.SSLService;
 using FreeSSL.Models;
 using FreeSSL.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -24,10 +25,7 @@ namespace FreeSSL.Controllers
 
 		[HttpPost("start")]
 		public async Task<IActionResult> Start([FromBody] StartMsg msg)
-			=> Json(await _sslCtrl.StartGetSSLAsync(msg.Domains, new ISSLCtrlService.AccountData
-			{ 
-				AccountPemKey = _accountDataOptions.AccountPemKey
-			}));
+			=> Json(await _sslCtrl.StartGetSSLAsync(msg.Domains, _accountDataOptions.ToSSLAccData()));
 
 		[HttpPost("download")]
 		public async Task<IActionResult> DownloadCertificate([FromBody] DownloadMsg msg)

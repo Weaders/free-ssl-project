@@ -7,3 +7,6 @@ teamcity/logs/*
 
 teamcity/agent/conf/*
 !teamcity/agent/conf/.gitkeep
+
+#ngnix ssl
+nginx/ssl/*
