@@ -1,4 +1,6 @@
 ﻿using FreeSSL.Domain;
+using FreeSSL.Domain.Exceptions;
+using FreeSSL.Domain.SSLService;
 using FreeSSL.Tests.Core;
 using FreeSSL.Tests.Mocks;
 using Microsoft.Extensions.DependencyInjection;
