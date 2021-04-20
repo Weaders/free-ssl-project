@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  api:
+    build: ./back
+    ports:
+      - '5000'
+    restart: always 
+
+  front:
+    build: 
+      context: ./front
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    environment:
+      - "NODE_ENV=development"
+    ports:
+      - '3000:3000'

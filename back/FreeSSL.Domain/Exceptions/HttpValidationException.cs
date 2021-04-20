@@ -10,7 +10,7 @@ namespace FreeSSL.Domain.Exceptions
 	{
 		public IEnumerable<FailedDomainValidation> FailedValidations { get; }
 
-		public string HumanMsg => string.Join("\r\n", FailedValidations.Select(v => $"Can not find by address {v.Location}, file with value {v.ExceptionValue}"));
+		public string HumanMsgKey => string.Join("\r\n", FailedValidations.Select(v => $"Can not find by address {v.Location}, file with value {v.ExceptionValue}"));
 
 		public HttpValidationException(IEnumerable<FailedDomainValidation> failedDomainValidations)
 		{

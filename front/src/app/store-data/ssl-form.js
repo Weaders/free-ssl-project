@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios'
 import config from './../../app/config'
 import _ from 'lodash'
-import Request from './../request'
 import { setIsLoading } from './main'
+import req from './../request'
 
 export const sslFormSlice = createSlice({
     name: 'sslForm',
@@ -43,42 +43,27 @@ export const { start, removeDomain, addDomain, clearChallenges, setCertData } = 
 
 export const startAsync = state => async (dispatch, getState) => {
 
-    try {
+    let result = await req.post(`${config.site}ssl/start`, {
+        domains: getState().sslForm.domains
+    }, dispatch, getState);
 
-        dispatch(setIsLoading(true));
-
-        let result = await axios.post(`${config.site}ssl/start`, {
-            domains: getState().sslForm.domains
-        });
-
+    if (result != null){
+        
         result.data.chalengeResults.forEach(ele => dispatch(sslFormSlice.actions.addChallenge(ele)));
         dispatch(sslFormSlice.actions.setSessionId(result.data.id));
-    }
-    finally {
-        dispatch(setIsLoading(false));
-    }
 
+    }
 };
 
 export const getCertAsync = state => async (dispatch, getState) => {
 
-    let state = getState();
+    let result = await req.post(`${config.site}ssl/start`, {
+        domains: getState().sslForm.domains
+    }, dispatch, getState);
 
-    try {
-
-        dispatch(setIsLoading(true));
-
-        let result = await axios.post(`${config.site}ssl/download`, {
-            id: state.sslForm.sessionId
-        });
-
+    if (result != null){
         dispatch(sslFormSlice.actions.setCertData(result.data));
-
     }
-    finally {
-        dispatch(setIsLoading(false));
-    }
-
 };
 
 export const selectState = state => state.sslForm.step;

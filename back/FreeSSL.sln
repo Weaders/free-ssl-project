@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL", "FreeSSL\FreeSSL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL.Domain", "FreeSSL.Domain\FreeSSL.Domain.csproj", "{D1AB2C99-8804-42BD-86FD-09419471A52F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSSL.Tests", "FreeSSL.Tests\FreeSSL.Tests.csproj", "{A05B49AC-7503-4702-8879-2B9F885AD1B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSSL.Tests", "FreeSSL.Tests\FreeSSL.Tests.csproj", "{A05B49AC-7503-4702-8879-2B9F885AD1B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13F7C6DD-72A8-4DF2-8C72-AA56B97D251F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

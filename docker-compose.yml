@@ -29,7 +29,6 @@ services:
     build: ./front
     volumes:
       - front_html:/app/build
-      - ./front:/app
     environment:
       - "NODE_ENV=production"
     ports:

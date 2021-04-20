@@ -1,5 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
-
+import { toast } from 'react-toastify';
 import ruLangData from './../langs/ru.json'
 
 export const LANG_RU = 'ru';
@@ -20,7 +20,7 @@ export const mainDataSlice = createSlice({
 
 export default mainDataSlice.reducer;
 
-const getLangData = state => {
+export const getLangData = state => {
 
     switch(state.main.lang){
         case LANG_RU:

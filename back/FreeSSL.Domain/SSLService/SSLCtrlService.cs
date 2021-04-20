@@ -1,7 +1,10 @@
 ﻿using Certes;
 using Certes.Acme;
 using FreeSSL.Domain.Exceptions;
+using FreeSSL.Domain.Options;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +16,7 @@ namespace FreeSSL.Domain.SSLService
 {
 	public interface ISSLCtrlService
 	{
-		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains, SSLAccountData accountData);
+		Task<StartGetSSLResult> StartGetSSLAsync(string[] domains);
 
 		Task<DownloadCersResult> TryDownloadCert(Guid id);
 
@@ -60,15 +63,21 @@ namespace FreeSSL.Domain.SSLService
 		private readonly IHttpClientFactory _clientFactory;
 		private readonly IMemoryCache _memCache;
 
+		private readonly Uri _uriLetsEncrypt;
+
+		private readonly AccountDataOptions _accountOpts;
+
 		/// <summary>
-		/// Used account that will be created after first use <see cref="StartGetSSLAsync(string[], SSLAccountData)"/>
+		/// Used account that will be created after first use <see cref="StartGetSSLAsync(string[])"/>, if there was no <see cref="_accountOpts"/>
 		/// </summary>
 		private string accountPemKey = null;
 
-		public SSLCtrlService(IMemoryCache memoryCache, IHttpClientFactory factory)
+		public SSLCtrlService(IMemoryCache memoryCache, IHttpClientFactory factory, IHostEnvironment hostEnvironment, IOptions<AccountDataOptions> accountOpts)
 		{
 			_memCache = memoryCache;
 			_clientFactory = factory;
+			_uriLetsEncrypt = hostEnvironment.IsDevelopment() ? WellKnownServers.LetsEncryptStagingV2 : WellKnownServers.LetsEncryptV2;
+			_accountOpts = accountOpts.Value;
 		}
 
 		public async Task<DownloadCersResult> TryDownloadCert(Guid id)
@@ -110,28 +119,31 @@ namespace FreeSSL.Domain.SSLService
 			}
 
 			throw new SessionExpirationException();
+
 		}
 
-		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains, SSLAccountData accountData)
+		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains)
 		{
 			domains = domains.Select(d => d.TrimEnd('/')).ToArray();
+
+
 			
 			AcmeContext acme;
 
-			if (!string.IsNullOrEmpty(accountData?.AccountPemKey))
+			if (!string.IsNullOrEmpty(_accountOpts?.AccountPemKey))
 			{
-				var accountKey = KeyFactory.FromPem(accountData?.AccountPemKey);
-				acme = new AcmeContext(WellKnownServers.LetsEncryptV2, accountKey);
+				var accountKey = KeyFactory.FromPem(_accountOpts.AccountPemKey);
+				acme = new AcmeContext(_uriLetsEncrypt, accountKey);
 			}
 			else if (!string.IsNullOrEmpty(accountPemKey))
 			{
 				var accountKey = KeyFactory.FromPem(accountPemKey);
-				acme = new AcmeContext(WellKnownServers.LetsEncryptV2, accountKey);
+				acme = new AcmeContext(_uriLetsEncrypt, accountKey);
 			}
 			else
 			{
-				acme = new AcmeContext(WellKnownServers.LetsEncryptV2);
-				var account = await acme.NewAccount(accountData?.Email, true);
+				acme = new AcmeContext(_uriLetsEncrypt);
+				var account = await acme.NewAccount(_accountOpts.Email, true);
 				accountPemKey = acme.AccountKey.ToPem();
 			}
 

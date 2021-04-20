@@ -88,7 +88,7 @@ export default function DomainsInput() {
             <TextField value={text} className={styles.input} onChange={e => setText(e.target.value)} id="outlined-basic" label={translate("domain")} variant="outlined" />
           </Grid>
           <Grid item xs={3}>
-            <Button onClick={addDomainFromTextBox} className={styles.btn} variant="contained" color="secondary">{translate("add_domain")}</Button>
+            <Button onClick={addDomainFromTextBox} disabled={text.length == 0} className={styles.btn} variant="contained" color="secondary">{translate("add_domain")}</Button>
           </Grid>
         </Grid>
       </div>

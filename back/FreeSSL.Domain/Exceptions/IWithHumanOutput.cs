@@ -2,6 +2,6 @@
 {
 	public interface IWithHumanOutput
 	{
-		string HumanMsg { get; }
+		string HumanMsgKey { get; }
 	}
 }

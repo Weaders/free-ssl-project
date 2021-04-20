@@ -1,7 +1,6 @@
-using FreeSSL.Domain;
 using FreeSSL.Domain.Exceptions;
+using FreeSSL.Domain.Options;
 using FreeSSL.Domain.SSLService;
-using FreeSSL.Models;
 using FreeSSL.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
@@ -26,7 +24,10 @@ namespace FreeSSL
 
 		public Startup(IConfiguration configuration)
 		{
-			Configuration = configuration;
+			Configuration = new ConfigurationBuilder()
+				.AddConfiguration(configuration)
+				.AddJsonFile("appsettings.User.json", true)
+				.Build();
 		}
 
 		public IConfiguration Configuration { get; }
@@ -42,7 +43,7 @@ namespace FreeSSL
 			services.AddMemoryCache();
 			services.AddHttpClient();
 
-			services.Configure<AccountDataOptions>(Configuration.GetSection(AccountDataOptions.KEY_SETTING));
+			services.Configure<AccountDataOptions>(Configuration.GetSection("AccountData"));
 
 			services.AddCors(opts =>
 			{
@@ -61,6 +62,8 @@ namespace FreeSSL
 				err.Run(async ctx =>
 				{
 					var feature = ctx.Features.Get<IExceptionHandlerPathFeature>();
+
+					ctx.Response.StatusCode = 500;
 
 					if (feature.Error is IWithHumanOutput humanOutput)
 					{

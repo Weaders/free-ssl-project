@@ -1,4 +1,6 @@
 {
     "authomatic_add_with_www": "Authomatic add domain with prefix `www.`",
-    "start_generate_ssl": "Start generate SSL"
+    "start_generate_ssl": "Start generate SSL",
+    "session_expired": "Your Session was be expired, please recreate it again",
+    "server_error": "There server error. I get msg and will fix it"
 }

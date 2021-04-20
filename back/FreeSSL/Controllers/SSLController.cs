@@ -1,7 +1,4 @@
-﻿using FreeSSL.Domain;
-using FreeSSL.Domain.SSLService;
-using FreeSSL.Models;
-using FreeSSL.ViewModels;
+﻿using FreeSSL.Domain.SSLService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -15,17 +12,15 @@ namespace FreeSSL.Controllers
 	{
 
 		private readonly ISSLCtrlService _sslCtrl;
-		private readonly AccountDataOptions _accountDataOptions;
 
-		public SSLController(ISSLCtrlService sslCtrl, IOptions<AccountDataOptions> accountDataOptions)
+		public SSLController(ISSLCtrlService sslCtrl)
 		{
 			_sslCtrl = sslCtrl;
-			_accountDataOptions = accountDataOptions.Value;
 		}
 
 		[HttpPost("start")]
 		public async Task<IActionResult> Start([FromBody] StartMsg msg)
-			=> Json(await _sslCtrl.StartGetSSLAsync(msg.Domains, _accountDataOptions.ToSSLAccData()));
+			=> Json(await _sslCtrl.StartGetSSLAsync(msg.Domains));
 
 		[HttpPost("download")]
 		public async Task<IActionResult> DownloadCertificate([FromBody] DownloadMsg msg)
@@ -45,7 +40,7 @@ namespace FreeSSL.Controllers
 		}
 
 		public class DownloadMsg
-		{ 
+		{
 			public string Id { get; set; }
 		}
 	}

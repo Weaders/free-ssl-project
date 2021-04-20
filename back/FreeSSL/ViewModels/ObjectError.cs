@@ -13,7 +13,7 @@ namespace FreeSSL.ViewModels
 
 		public ObjectError(IWithHumanOutput exception)
 		{
-			Msg = exception.HumanMsg;
+			Msg = exception.HumanMsgKey;
 		}
 
 		public ObjectError(Exception e) : this()

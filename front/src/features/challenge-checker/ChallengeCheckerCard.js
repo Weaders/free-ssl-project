@@ -48,7 +48,4 @@ export default function ChallengeCheckerCard(props) {
             </div>
         </CardContent>
     </Card>);
-
-    
-
 }
