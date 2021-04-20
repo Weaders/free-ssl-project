@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Moq;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +11,11 @@ namespace FreeSSL.Tests.Core
 	{
 		public TestServiceCollection()
 		{
+			var testEnv = new Mock<IHostEnvironment>();
+
+			testEnv.Setup(t => t.EnvironmentName).Returns("Development");
+
+			this.AddSingleton(testEnv.Object);
 		}
 
 		public ITestServiceProvider GetServiceProvider()
