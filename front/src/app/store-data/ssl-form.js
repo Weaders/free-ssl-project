@@ -33,7 +33,8 @@ export const sslFormSlice = createSlice({
         setCertData: (state, action) => {
             state.certData = {
                 privateKey: action.payload.privateKey,
-                pemKey: action.payload.pemKey
+                pemKey: action.payload.pemKey,
+                expiredDate: new Date(action.payload.expiredDate)
             };
         }
     }
@@ -49,7 +50,7 @@ export const startAsync = state => async (dispatch, getState) => {
 
     if (result != null){
         
-        result.data.chalengeResults.forEach(ele => dispatch(sslFormSlice.actions.addChallenge(ele)));
+        result.data.challengeResults.forEach(ele => dispatch(sslFormSlice.actions.addChallenge(ele)));
         dispatch(sslFormSlice.actions.setSessionId(result.data.id));
 
     }
@@ -57,8 +58,8 @@ export const startAsync = state => async (dispatch, getState) => {
 
 export const getCertAsync = state => async (dispatch, getState) => {
 
-    let result = await req.post(`${config.site}ssl/start`, {
-        domains: getState().sslForm.domains
+    let result = await req.post(`${config.site}ssl/download`, {
+        id: getSessionId(getState())
     }, dispatch, getState);
 
     if (result != null){
@@ -75,5 +76,7 @@ export const getEnteredDomain = state => state.sslForm.getEnteredDomain;
 export const getChallenges = state => state.sslForm.challenges;
 
 export const getCertData = state => state.sslForm.certData;
+
+export const getSessionId = state => state.sslForm.sessionId;
 
 export default sslFormSlice.reducer;

@@ -60,12 +60,12 @@ export function SSLForm(){
     let content = null;
     
     if (certData != null){
-
+        
         content = (
             <React.Fragment>
                 <Card className={classes.createFileInfo}>
                     <CardContent className={classes.thisIsYourCert}>
-                        {translate("there_you_certificate")}: <b>Date: {certData.expiredDate.toLocaleString()}</b>
+                        {translate("there_you_certificate")}: <b>{certData.expiredDate.toString()}</b>
                     </CardContent>
                 </Card>
                 <Card className={classes.createFileInfo}>

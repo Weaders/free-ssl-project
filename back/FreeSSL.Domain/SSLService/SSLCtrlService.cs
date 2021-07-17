@@ -28,7 +28,7 @@ namespace FreeSSL.Domain.SSLService
 			}
 
 			public Guid Id { get; set; }
-			public List<HttpChallengeResult> ChalengeResults { get; set; } = new List<HttpChallengeResult>();
+			public List<HttpChallengeResult> ChallengeResults { get; set; } = new List<HttpChallengeResult>();
 		}
 
 		public class HttpChallengeResult
@@ -50,12 +50,6 @@ namespace FreeSSL.Domain.SSLService
 			}
 		}
 
-		public class SSLAccountData 
-		{
-			public string AccountPemKey { get; set; }
-			public string Email { get; set; }
-		}
-
 	}
 
 	public class SSLCtrlService : ISSLCtrlService
@@ -70,13 +64,16 @@ namespace FreeSSL.Domain.SSLService
 		/// <summary>
 		/// Used account that will be created after first use <see cref="StartGetSSLAsync(string[])"/>, if there was no <see cref="_accountOpts"/>
 		/// </summary>
-		private string accountPemKey = null;
+		private string _accountPemKey = null;
+
+		private readonly IHostEnvironment _hostEnv;
 
 		public SSLCtrlService(IMemoryCache memoryCache, IHttpClientFactory factory, IHostEnvironment hostEnvironment, IOptions<AccountDataOptions> accountOpts)
 		{
+			_hostEnv = hostEnvironment;
 			_memCache = memoryCache;
 			_clientFactory = factory;
-			_uriLetsEncrypt = hostEnvironment.IsDevelopment() ? WellKnownServers.LetsEncryptStagingV2 : WellKnownServers.LetsEncryptV2;
+			_uriLetsEncrypt = _hostEnv.IsDevelopment() ? WellKnownServers.LetsEncryptStagingV2 : WellKnownServers.LetsEncryptV2;
 			_accountOpts = accountOpts.Value;
 		}
 
@@ -86,14 +83,18 @@ namespace FreeSSL.Domain.SSLService
 			{
 				using var client = _clientFactory.CreateClient();
 
-				var failedChecks = (await Task.WhenAll(makeSSLCtx.HttpChallengeResults.Select(async (challenge) =>
+				// In dev mode we can not check by myself
+				if (!_hostEnv.IsDevelopment())
 				{
-					var result = await client.GetAsync(challenge.Location);
-					return (challenge, challenge.Token == await result.Content.ReadAsStringAsync());
-				}))).Where(c => !c.Item2).Select(c => new FailedDomainValidation(c.challenge));
+					var failedChecks = (await Task.WhenAll(makeSSLCtx.HttpChallengeResults.Select(async (challenge) =>
+					{
+						var result = await client.GetAsync(challenge.Location);
+						return (challenge, challenge.Token == await result.Content.ReadAsStringAsync());
+					}))).Where(c => !c.Item2).Select(c => new FailedDomainValidation(c.challenge));
 
-				if (failedChecks.Any())
-					throw new HttpValidationException(failedChecks);
+					if (failedChecks.Any())
+						throw new HttpValidationException(failedChecks);
+				}
 
 				foreach (var challenge in makeSSLCtx.Challenges)
 				{
@@ -125,8 +126,6 @@ namespace FreeSSL.Domain.SSLService
 		public async Task<StartGetSSLResult> StartGetSSLAsync(string[] domains)
 		{
 			domains = domains.Select(d => d.TrimEnd('/')).ToArray();
-
-
 			
 			AcmeContext acme;
 
@@ -135,16 +134,16 @@ namespace FreeSSL.Domain.SSLService
 				var accountKey = KeyFactory.FromPem(_accountOpts.AccountPemKey);
 				acme = new AcmeContext(_uriLetsEncrypt, accountKey);
 			}
-			else if (!string.IsNullOrEmpty(accountPemKey))
+			else if (!string.IsNullOrEmpty(_accountPemKey))
 			{
-				var accountKey = KeyFactory.FromPem(accountPemKey);
+				var accountKey = KeyFactory.FromPem(_accountPemKey);
 				acme = new AcmeContext(_uriLetsEncrypt, accountKey);
 			}
 			else
 			{
 				acme = new AcmeContext(_uriLetsEncrypt);
 				var account = await acme.NewAccount(_accountOpts.Email, true);
-				accountPemKey = acme.AccountKey.ToPem();
+				_accountPemKey = acme.AccountKey.ToPem();
 			}
 
 			var order = await acme.NewOrder(domains);
@@ -154,7 +153,7 @@ namespace FreeSSL.Domain.SSLService
 
 			var getSSLResults = new StartGetSSLResult
 			{
-				ChalengeResults = challenges.Select(c =>
+				ChallengeResults = challenges.Select(c =>
 				{
 					enumDomain.MoveNext();
 
@@ -168,7 +167,7 @@ namespace FreeSSL.Domain.SSLService
 				}).ToList()
 			};
 
-			_memCache.Set(getSSLResults.Id, new MakeSSLContext(order, challenges, getSSLResults.ChalengeResults), new MemoryCacheEntryOptions
+			_memCache.Set(getSSLResults.Id, new MakeSSLContext(order, challenges, getSSLResults.ChallengeResults), new MemoryCacheEntryOptions
 			{
 				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
 			});

@@ -11,17 +11,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using Microsoft.Extensions.Options;
 
 namespace FreeSSL
 {
 	public class Startup
 	{
-
-		readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = new ConfigurationBuilder()
@@ -31,12 +30,19 @@ namespace FreeSSL
 		}
 
 		public IConfiguration Configuration { get; }
-
-		// This method gets called by the runtime. Use this method to add services to the container.
+		
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton<ISSLCtrlService, SSLCtrlService>();
 
+			services.AddCors(opts =>
+			{
+				opts.AddDefaultPolicy(build =>
+				{
+					build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+				});
+			});
+			
 			services.AddControllers()
 				.AddNewtonsoftJson();
 
@@ -44,20 +50,16 @@ namespace FreeSSL
 			services.AddHttpClient();
 
 			services.Configure<AccountDataOptions>(Configuration.GetSection("AccountData"));
-
-			services.AddCors(opts =>
-			{
-				opts.AddPolicy(name: MyAllowSpecificOrigins, build =>
-				{
-					build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-				});
-			});
+			
 		}
-
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<AccountDataOptions> opts)
 		{
-
+			
+			Debug.Assert(!string.IsNullOrWhiteSpace(opts.Value.Email));
+			
+			app.UseCors();
+			
 			app.UseExceptionHandler(err =>
 				err.Run(async ctx =>
 				{
@@ -75,14 +77,13 @@ namespace FreeSSL
 					}
 				})
 			);
-
+			
+#if !DEBUG
 			app.UseHttpsRedirection();
-
+#endif
 			app.UseRouting();
 
 			app.UseAuthorization();
-
-			app.UseCors(MyAllowSpecificOrigins);
 
 			app.UseEndpoints(endpoints =>
 			{
@@ -120,6 +121,7 @@ namespace FreeSSL
 
 				});
 			});
+			
 		}
 	}
 }

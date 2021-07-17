@@ -17,8 +17,11 @@ const useStyles = makeStyles({
     zIndex: 10
   },
   headaerText: {
-    'font-style': 'italic',
-    'padding-right': '10px'
+    fontStyle: 'italic',
+    paddingRight: '10px',
+    color: 'rgba(0, 0, 0, 0.87)',
+    textDecoration: 'none'
+
   },
   gitIcon: {
     width: '32px'
@@ -38,13 +41,16 @@ function App() {
     <React.Fragment>
       <AppBar position="sticky" color="default" className={styles.header}>
         <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap className={styles.headaerText}>
-            SSL Get
-          </Typography>
+          <a href="/" className={styles.headaerText}>
+            <Typography variant="h6" color="inherit" noWrap className={styles.headaerText}>
+              SSL Get
+            </Typography>
+          </a>
           <div className={styles.gitIconContainer}>
             <a href="https://github.com/Weaders/free-ssl-project"  rel="noreferrer" target="_blank"><img alt="git link" src="GitHub-Mark-120px-plus.png" className={styles.gitIcon} /></a>
           </div>
         </Toolbar>
+        
       </AppBar>
       <Container component="main">
         <SSLForm />
