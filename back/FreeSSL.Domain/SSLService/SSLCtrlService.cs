@@ -89,7 +89,7 @@ namespace FreeSSL.Domain.SSLService
 					var failedChecks = (await Task.WhenAll(makeSSLCtx.HttpChallengeResults.Select(async (challenge) =>
 					{
 						var result = await client.GetAsync(challenge.Location);
-						return (challenge, challenge.Token == await result.Content.ReadAsStringAsync());
+						return (challenge, challenge.Key == await result.Content.ReadAsStringAsync());
 					}))).Where(c => !c.Item2).Select(c => new FailedDomainValidation(c.challenge));
 
 					if (failedChecks.Any())
